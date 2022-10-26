@@ -18,8 +18,7 @@ To place a view at Laravel:
     <title>Professional Football League</title>
     <meta charset="UTF-8">
     <link rel="icon" type="image/x-icon" href="images/football.svg">
-<!-- <link rel="stylesheet" href="CSS/League.css"> -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="css/app.css">
   </head>
 
   <body class="max-w-screen-xl m-auto flex flex-col">
