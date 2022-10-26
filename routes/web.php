@@ -19,5 +19,7 @@ use App\Http\Controllers\teamsC;
 #    return view('welcome');
 # });
 
-Route::get ('/', [teamsC::class, 'show']);
+Route::get ('/', [teamsC::class, 'manage']);
+
+Route::post ('/', [teamsC::class, 'manage']);
 

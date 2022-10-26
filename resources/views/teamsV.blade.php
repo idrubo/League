@@ -15,7 +15,7 @@ To place a view at Laravel:
 <html>
 
   <head>
-    <title>Professional Football League</title>
+    <title>Football League</title>
     <meta charset="UTF-8">
     <link rel="icon" type="image/x-icon" href="images/football.svg">
     <link rel="stylesheet" href="css/app.css">
@@ -59,7 +59,8 @@ To place a view at Laravel:
         <div class="m-1 bg-BurlyWood basis-2/4 flex justify-center">
           <div class="m-2.5 p-2.5 flex flex-column">
 
-            <form action="">
+            <form action="/" method="post">
+            @csrf
 
 <!-- Text input 1 -->
 
@@ -96,7 +97,7 @@ To place a view at Laravel:
 <!-- Submit button 1 -->
 
               <div class="m-1 border-none bg-Navy text-white text-center hover:bg-MediumBlue">
-                <button type="submit" name="update" value="update" class="w-full">Create</button>
+                <button type="submit" name="create" value="create" class="w-full">Create</button>
               </div>
               <div class="m-1 border-none bg-Navy text-white text-center hover:bg-MediumBlue">
                 <button type="submit" name="update" value="update" class="w-full">Update</button>
