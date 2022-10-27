@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\minimalC;
+use App\Http\Controllers\teamsC;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,9 +15,7 @@ use App\Http\Controllers\minimalC;
 |
 */
 
-# Route::get('/', function () {
-#    return view('welcome');
-# });
+Route::get ('/', [teamsC::class, 'manage']);
 
-Route::get ('/', [minimalC::class, 'show']);
+Route::post ('/', [teamsC::class, 'manage']);
 

@@ -16,9 +16,10 @@ class CrtPlayers extends Migration
     Schema::create ('players', function (Blueprint $table) {
       $table->id ();
       $table->unsignedInteger ('idplatea');
-      $table->string ('name', 50);
+      $table->string ('player', 50);
       $table->string ('address', 100);
       $table->string ('phone', 20);
+      $table-> timestamps ();
     });
   }
 

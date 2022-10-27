@@ -20,6 +20,8 @@ class CrtGames extends Migration
       $table->string ('location', 100);
       $table->unsignedInteger ('L');
       $table->unsignedInteger ('V');
+      $table->dateTime ('dGame');
+      $table->timestamps ();
     });
   }
 

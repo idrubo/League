@@ -15,9 +15,10 @@ class CrtTeams extends Migration
   {
     Schema::create ('teams', function (Blueprint $table) {
       $table->id ();
-      $table->string ('name', 50);
+      $table->string ('team', 50);
       $table->string ('address', 100);
       $table->string ('phone', 20);
+      $table->timestamps ();
     });
   }
 
