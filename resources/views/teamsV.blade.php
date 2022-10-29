@@ -1,17 +1,5 @@
 <!DOCTYPE html>
 
-<!-- DEBUG -->
-<!-- DEBUG -->
-<!-- DEBUG -->
-<!-- Error variables must be rendered through -->
-<!--
-To place a view at Laravel:
-
--->
-<!-- DEBUG -->
-<!-- DEBUG -->
-<!-- DEBUG -->
-
 <html>
 
   <head>
@@ -69,7 +57,8 @@ To place a view at Laravel:
                   <input type="text" name="team" placeholder="Team" class="w-full">
                 </div>
                 <div class="pt-0 pr-0 pb-0 pl-1 text-red-500 font-bold">
-                  <?php echo $GLOBALS ['teaErr']; ?>
+                  @error('team') {{ $message }} @enderror
+                  @if ($exists !== false) {{ $exists }} @endif
                 </div>
               </div>
 
@@ -78,7 +67,7 @@ To place a view at Laravel:
                   <input type="text" name="address" placeholder="Address" class="w-full">
                 </div>
                 <div class="pt-0 pr-0 pb-0 pl-1 text-red-500 font-bold">
-                  <?php echo $GLOBALS ['addErr']; ?>
+                  @error('address') {{ $message }} @enderror
                 </div>
               </div>
 
@@ -88,24 +77,27 @@ To place a view at Laravel:
                   <input type="text" name="phone" placeholder="Phone" class="w-full">
                 </div>
                 <div class="pt-0 pr-0 pb-0 pl-1 text-red-500 font-bold">
-                  <?php echo $GLOBALS ['phoErr']; ?>
+                  @error('phone') {{ $message }} @enderror
                 </div>
               </div>
 
 <!-- Text input 1 -->
 
-<!-- Submit button 1 -->
+<!-- Submit buttons -->
 
-              <div class="m-1 border-none bg-Navy text-white text-center hover:bg-MediumBlue">
+              <div class="w-48 m-1 border-none bg-Navy text-white text-center hover:bg-MediumBlue">
                 <button type="submit" name="create" value="create" class="w-full">Create</button>
               </div>
-              <div class="m-1 border-none bg-Navy text-white text-center hover:bg-MediumBlue">
+              <div class="w-48 m-1 border-none bg-Navy text-white text-center hover:bg-MediumBlue">
                 <button type="submit" name="update" value="update" class="w-full">Update</button>
               </div>
-              <div class="m-1 border-none bg-Navy text-white text-center hover:bg-MediumBlue">
+              <div class="w-48 m-1 border-none bg-Navy text-white text-center hover:bg-MediumBlue">
+                <button type="submit" name="delete" value="detete" class="w-full">Delete</button>
+              </div>
+              <div class="w-48 m-1 border-none bg-Navy text-white text-center hover:bg-MediumBlue">
                 <button type="submit" name="show" value="show" class="w-full">Show</button>
               </div>
-              <div class="m-1 border-none bg-Navy text-white text-center hover:bg-MediumBlue">
+              <div class="w-48 m-1 border-none bg-Navy text-white text-center hover:bg-MediumBlue">
                 <button type="submit" name="all" value="all" class="w-full">All</button>
               </div>
 
@@ -120,8 +112,23 @@ To place a view at Laravel:
 
 <!-- Column 2 -->
 
-        <div class="m-1 bg-BurlyWood basis-2/4 flex justify-center visible">
-          <div class="m-2.5 p-2.5 flex flex-column">
+        <div class="m-1 bg-BurlyWood basis-2/4 flex visible">
+          <div class="m-2.5 p-2.5 flex flex-column self-start">
+
+            @if ($listing !== false)
+              <table class="text-Navy"><tr>
+                <th class="pr-2 pl-2">Team</th>
+                <th class="pr-2 pl-2">Address</th>
+                <th class="pr-2 pl-2">Phone</th></tr>
+                  @foreach ($listing as $l)
+                    <tr>
+                      <td class="pr-2 pl-2"> {{ $l ['team'] }}    </td>
+                      <td class="pr-2 pl-2"> {{ $l ['address'] }} </td>
+                      <td class="pr-2 pl-2"> {{ $l ['phone'] }}   </td>
+                    </tr>
+                  @endforeach
+              </tr></table>
+            @endif
 
           </div>
         </div>

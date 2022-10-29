@@ -5,58 +5,150 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Team;
 
-require base_path () . "/debug/toConsole.php";
-
-/* DEBUG */
-/* DEBUG */
-/* DEBUG */
-/* Should be moved to the validate module. */
-$GLOBALS ['teaErr'] = "";
-$GLOBALS ['addErr'] = "";
-$GLOBALS ['phoErr'] = "";
-/* DEBUG */
-/* DEBUG */
-/* DEBUG */
+require_once base_path () . "/debug/toConsole.php";
 
 class teamsC extends Controller
 {
-
   public function manage (Request $request)
   {
-    msgToConsole ("Into teamsC->manage");
+    $render = array ('listing' => false, 'exists'  => false);
 
     $method = $request->method ();
-    varToConsole ('$method', $method);
 
     if ($request->isMethod ("post"))
     {
-      msgToConsole ("teamsC->manage: It is a post.");
-
       if ($request->has ('create'))
-      {
-        msgToConsole ("teamsC->manage: It is a create action.");
-        $this->crtTeam ($request);
-        return view ('teamsV');
-      }
-    }
+        $render ['exists'] = $this->crtTeam ($request);
 
-    msgToConsole ("Leaving teamsC->manage");
-    return view ('teamsV');
+      if ($request->has ('update'))
+        $render ['exists'] = $this->updtTeam ($request);
+
+      if ($request->has ('delete'))
+        $render ['exists'] = $this->delTeam ($request);
+
+      if ($request->has ('show'))
+      {
+        $render ['listing'] = $this->showTeam ($request);
+        if ($render ['listing'] === false)
+          $render ['exists'] = 'Doesn\'t exist';
+      }
+
+      if ($request->has ('all'))
+        $render ['listing'] = $this->showAll ($request);
+    }
+    return view ('teamsV', $render);
   }
 
   private function crtTeam ($r)
   {
-    $t = new Team ();
-    varToConsole ('$r', $r);
+    $exists = false;
+
+    $r->validate ([
+      'team'    => 'required|max:50',
+      'address' => 'required|max:100',
+      'phone'   => 'required|max:20',
+    ]);
 
     $post = $r->all();
-    varToConsole ('$post', $post);
 
-    $t->team    = $post ['team'];
-    $t->address = $post ['address'];
-    $t->phone   = $post ['phone'];
+    if (! Team::where ('team', $post ['team'])->get ()->count ())
+    {
+      $row = new Team ();
 
-    $t->save();
+      $row->team    = $post ['team'];
+      $row->address = $post ['address'];
+      $row->phone   = $post ['phone'];
+
+      $row->save();
+
+      return $exists;
+    }
+
+    return $exists = 'Already exists !!!';
+  }
+
+  private function updtTeam ($r)
+  {
+    $exists = false;
+
+    $r->validate ([
+      'team'    => 'required|max:50',
+    ]);
+
+    $post = $r->all ();
+
+    if ($row = Team::where ('team', $post ['team'])->get ()->count ())
+    {
+      $row = Team::where ('team', $post ['team'])->get ();
+
+      foreach ($row as $r)
+      {
+        if (empty ($post ['address'])) $post ['address'] = $r->address;
+        if (empty ($post ['phone']))   $post ['phone']   = $r->phone;
+      }
+
+      $row = Team::where ('team', $post ['team'])
+        ->update ([
+          'address' => $post ['address'],
+          'phone'   => $post ['phone']]);
+
+      return $exists;
+    }
+
+    return $exists = 'Doesn\'t exist !!!';
+  }
+
+  private function delTeam ($r)
+  {
+    $exists = false;
+
+    $r->validate ([
+      'team'    => 'required|max:50',
+    ]);
+
+    $post = $r->all ();
+
+    if (Team::where ('team', $post ['team'])->get ()->count ())
+    {
+      $row = Team::where ('team', $post ['team'])->delete ();
+      return $exists;
+    }
+
+    return $exists = 'Doesn\'t exist !!!';
+  }
+
+  private function showTeam ($r)
+  {
+    $listing = false;
+
+    $r->validate ([
+      'team'    => 'required|max:50',
+    ]);
+
+    $post = $r->all ();
+
+    $rows = Team::where ('team', $post ['team'])->get ();
+
+    if ($rows->count ())
+    {
+      foreach ($rows as $r)
+      {
+        $lst = array (
+          'team'    => $r->team,
+          'address' => $r->address,
+          'phone'   => $r->phone);
+      }
+      return $listing = array ($lst);
+    }
+
+    return $listing;
+  }
+
+  private function showAll ($r)
+  {
+    $post = $r->all ();
+
+    return $listing = Team::all ();
   }
 }
 
