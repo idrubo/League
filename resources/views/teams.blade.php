@@ -16,9 +16,9 @@
     <header class="mt-2.5 mr-0 mb-0 ml-0" >
 
       <nav class="p-1 bg-LightBlue Arial sans-serif text-base font-bold">
-        <a class="pt-0 pr-2.5 pb-0 pl-1 text-Navy no-underline hover:no-underline hover:bg-Gold" href="teams.php">Teams</a>
-        <a class="pt-0 pr-2.5 pb-0 pl-1 text-Navy no-underline hover:no-underline hover:bg-Gold" href="players.php">Players</a>
-        <a class="pt-0 pr-2.5 pb-0 pl-1 text-Navy no-underline hover:no-underline hover:bg-Gold" href="games.php">Games</a>
+        <a class="pt-0 pr-2.5 pb-0 pl-1 text-Navy no-underline hover:no-underline hover:bg-Gold" href="/teams/">Teams</a>
+        <a class="pt-0 pr-2.5 pb-0 pl-1 text-Navy no-underline hover:no-underline hover:bg-Gold" href="/players/">Players</a>
+        <a class="pt-0 pr-2.5 pb-0 pl-1 text-Navy no-underline hover:no-underline hover:bg-Gold" href="/games/">Games</a>
       </nav>
 
       <div class="bg-MidnightBlue text-BlanchedAlmond flex justify-center">
