@@ -36,7 +36,7 @@ class teamsC extends Controller
       if ($request->has ('all'))
         $render ['listing'] = $this->showAll ($request);
     }
-    return view ('teamsV', $render);
+    return view ('/teams/teams', $render);
   }
 
   private function crtTeam ($r)
@@ -77,9 +77,10 @@ class teamsC extends Controller
 
     $post = $r->all ();
 
-    if ($row = Team::where ('team', $post ['team'])->get ()->count ())
+    $row = Team::where ('team', $post ['team'])->get ();
+
+    if ($row->count ())
     {
-      $row = Team::where ('team', $post ['team'])->get ();
 
       foreach ($row as $r)
       {
