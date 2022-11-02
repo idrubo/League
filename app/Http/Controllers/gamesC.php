@@ -54,58 +54,9 @@ class gamesC extends Controller
 
     $post = $r->all();
 
-    /* DEBUG */
-    /* DEBUG */
-    /* DEBUG */
-    /* The following code is repeated four times. */
+    $status = Game::saveGame ($post);
 
-    $idLocal = $this->fkIdGame ($post ['local']);
-    if (! $idLocal)
-    {
-      $this->render ['local'] = 'Doesn\'t exist !!!';
-      return;
-    }
-
-    $idVisitor = $this->fkIdGame ($post ['visitor']);
-    if (! $idVisitor)
-    {
-      $this->render ['visitor'] = 'Doesn\'t exist !!!';
-      return;
-    }
-
-    $game = Game::where ('idLocal', $idLocal)
-      ->where ('idVisitor', $idVisitor)
-      ->get ();
-
-    /* DEBUG */
-    /* DEBUG */
-    /* DEBUG */
-
-    if ($idLocal === $idVisitor)
-    {
-      $this->render ['local']   = 'Teams must be different !!!';
-      $this->render ['visitor'] = 'Teams must be different !!!';
-      return;
-    }
-
-    if (! $game->count ())
-    {
-      $games = new Game ();
-
-      $games->idlocal   = $idLocal;
-      $games->idvisitor = $idVisitor;
-      $games->location  = $post ['location'];
-      $games->dGame     = $post ['dGame'];
-      $games->L         = $post ['L'];
-      $games->V         = $post ['V'];
-
-      $games->save();
-
-      return;
-    }
-
-    $this->render ['local']   = 'Game already exist !!!';
-    $this->render ['visitor'] = 'Game already exist !!!';
+    $this->checkStatus ($status);
   }
 
   private function updtGame ($r)
@@ -121,59 +72,9 @@ class gamesC extends Controller
 
     $post = $r->all ();
 
-    /* DEBUG */
-    /* DEBUG */
-    /* DEBUG */
-    /* The following code is repeated four times. */
+    $status = Game::updateGame ($post);
 
-    $idLocal = $this->fkIdGame ($post ['local']);
-    if (! $idLocal)
-    {
-      $this->render ['local'] = 'Doesn\'t exist !!!';
-      return;
-    }
-
-    $idVisitor = $this->fkIdGame ($post ['visitor']);
-    if (! $idVisitor)
-    {
-      $this->render ['visitor'] = 'Doesn\'t exist !!!';
-      return;
-    }
-
-    $game = Game::where ('idLocal', $idLocal)
-      ->where ('idVisitor', $idVisitor)
-      ->get ();
-
-    /* DEBUG */
-    /* DEBUG */
-    /* DEBUG */
-
-    if ($game->count ())
-    {
-      foreach ($game as $g)
-      {
-        if (empty ($post ['location'])) $post ['location'] = $g->location;
-        if (empty ($post ['dGame']))    $post ['dGame']    = $g->dGame;
-        if (empty ($post ['L']))        $post ['L']        = $g->L;
-        if (empty ($post ['V']))        $post ['V']        = $g->V;
-      }
-
-      varToConsole ('$post', $post);
-
-      $game = Game::where ('idLocal', $idLocal)
-        ->where ('idVisitor', $idVisitor)
-        ->update ([
-          'location' => $post ['location'],
-          'dGame'    => $post ['dGame'],
-          'L'        => $post ['L'],
-          'V'        => $post ['V'],
-        ]);
-
-      return;
-    }
-
-    $this->render ['local']   = 'Game doesn\'t exist !!!';
-    $this->render ['visitor'] = 'Game doesn\'t exist !!!';
+    $this->checkStatus ($status);
   }
 
   private function delGame ($r)
@@ -327,7 +228,35 @@ class gamesC extends Controller
 
     return $idTeam;
   }
-}
 
+  private function checkStatus ($status)
+  {
+    switch ($status)
+    {
+    case 1:
+      $this->render ['local'] = 'Doesn\'t exist !!!';
+      break;
+
+    case 2:
+      $this->render ['visitor'] = 'Doesn\'t exist !!!';
+      break;
+
+    case 3:
+      $this->render ['local']   = 'Teams must be different !!!';
+      $this->render ['visitor'] = 'Teams must be different !!!';
+      break;
+
+    case 4:
+      $this->render ['local']   = 'Game already exist !!!';
+      $this->render ['visitor'] = 'Game already exist !!!';
+      break;
+
+    case 5:
+      $this->render ['local']   = 'Game doesn\'t exist !!!';
+      $this->render ['visitor'] = 'Game doesn\'t exist !!!';
+      break;
+    }
+  }
+}
 ?>
 
