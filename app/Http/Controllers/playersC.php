@@ -7,6 +7,7 @@ use App\Models\Team;
 use App\Models\Player;
 
 require_once base_path () . "/debug/toConsole.php";
+require_once base_path () . "/app/Http/Controllers/status.php";
 
 class playersC extends Controller
 {
@@ -52,28 +53,9 @@ class playersC extends Controller
 
     $post = $r->all();
 
-    if (! Player::where ('player', $post ['player'])->get ()->count ())
-    {
-      $player = new Player ();
+    $status = Player::savePlayer ($post);
 
-      if (! ($idplatea = $this->fkIdPlaTea ($player, $post)))
-      {
-        $this->render ['team'] = 'Doesn\'t exist !!!';
-        return;
-      }
-
-      $player->idplatea = $idplatea;
-
-      $player->player  = $post ['player'];
-      $player->address = $post ['address'];
-      $player->phone   = $post ['phone'];
-
-      $player->save();
-
-      return;
-    }
-
-    $this->render ['player'] = 'Already exists !!!';
+    $this->checkStatus ($status);
   }
 
   private function updtPlayer ($r)
@@ -84,39 +66,9 @@ class playersC extends Controller
 
     $post = $r->all ();
 
-    $player = Player::where ('player', $post ['player'])->get ();
+    $status = Player::updatePlayer ($post);
 
-    if ($player->count ())
-    {
-      foreach ($player as $p)
-      {
-        if (empty ($post ['team']))
-        {
-          $idplatea = $p->idplatea;
-        }
-        else
-        {
-          if (! ($idplatea = $this->fkIdPlaTea ($player, $post)))
-          {
-            $this->render ['team'] = 'Doesn\'t exist !!!';
-            return;
-          }
-        }
-        if (empty ($post ['address'])) $post ['address'] = $p->address;
-        if (empty ($post ['phone']))   $post ['phone']   = $p->phone;
-      }
-
-      $player = Player::where ('player', $post ['player'])
-        ->update ([
-          'idplatea' => $idplatea,
-          'address'  => $post ['address'],
-          'phone'    => $post ['phone'],
-        ]);
-
-      return;
-    }
-
-    $this->render ['player'] = 'Doesn\'t exist !!!';
+    $this->checkStatus ($status);
   }
 
   private function delPlayer ($r)
@@ -127,13 +79,9 @@ class playersC extends Controller
 
     $post = $r->all ();
 
-    if (Player::where ('player', $post ['player'])->get ()->count ())
-    {
-      $row = Player::where ('player', $post ['player'])->delete ();
-      return;
-    }
+    $status = Player::deletePlayer ($post);
 
-    $this->render ['player'] = 'Doesn\'t exist !!!';
+    $this->checkStatus ($status);
   }
 
   private function showPlayer ($r)
@@ -144,67 +92,38 @@ class playersC extends Controller
 
     $post = $r->all ();
 
-    $player = Player::where ('player', $post ['player'])->get ();
+    $status = Player::listPlayer ($post, $lst);
 
-    if ($player->count ())
-    {
-      foreach ($player as $p)
-      {
-        $row = Team::where ('id', $p->idplatea)->get ();
-        foreach ($row as $r) $team = $r->team;
-
-        $lst = array (
-          'team'    => $team,
-          'player'  => $p->player,
-          'address' => $p->address,
-          'phone'   => $p->phone,
-        );
-      }
+    if ($status === listOK)
       $this->render ['listing'] = array ($lst);
-      return;
-    }
-
-    $this->render ['player'] = 'Doesn\'t exist !!!';
+    else
+      $this->checkStatus ($status);
   }
 
-  private function showAll ($r)
+  private function showAll ()
   {
-    $item = array ();
-    $lst  = array ();
-
-    $post = $r->all ();
-
-    $player = Player::all ();
-
-    foreach ($player as $p)
-    {
-      $row = Team::where ('id', $p->idplatea)->get ();
-      foreach ($row as $r) $team = $r->team;
-
-      $item ['team']    = $team;
-      $item ['player']  = $p->player;
-      $item ['address'] = $p->address;
-      $item ['phone']   = $p->phone;
-
-      array_push ($lst, $item);
-    }
+    Player::listAll ($lst);
 
     $this->render ['listing'] = $lst;
   }
 
-  private function fkIdPlaTea ($player, $post)
+  private function checkStatus ($status)
   {
-    $team = Team::where ('team', $post ['team'])->get ();
+    switch ($status)
+    {
+    case teamNotXST:
+      $this->render ['team']   = 'Team doesn\'t exist !!!';
+      break;
 
-    if (! ($n = $team->count ())) return $n;
+    case playerXST:
+      $this->render ['player'] = 'Player already exist !!!';
+      break;
 
-    foreach ($team as $t)
-      if (strtolower ($t->team) == strtolower ($post ['team']))
-        $idplatea = $t ['id'];
-
-    return $idplatea;
+    case playerNotXST:
+      $this->render ['player'] = 'Player doesn\'t exist !!!';
+      break;
+    }
   }
 }
-
 ?>
 
