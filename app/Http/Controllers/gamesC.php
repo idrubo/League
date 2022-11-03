@@ -6,15 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Game;
 
-define ("crudOK",      0);
-define ("localNotXST", 1);
-define ("visitNotXST", 2);
-define ("teamsEQU",    3);
-define ("gameXST",     4);
-define ("gameNotXST",  5);
-define ("listOK",      6);
-
 require_once base_path () . "/debug/toConsole.php";
+require_once base_path () . "/app/Http/Controllers/status.php";
 
 class gamesC extends Controller
 {
@@ -44,7 +37,7 @@ class gamesC extends Controller
         $this->showGame ($request);
 
       if ($request->has ('all'))
-        $this->showAll ($request);
+        $this->showAll ();
     }
     return view ('/games/games', $this->render);
   }
@@ -85,6 +78,14 @@ class gamesC extends Controller
     $this->checkStatus ($status);
   }
 
+  public function messages()
+  {
+    return [
+      'L.integer' => 'An integer is required',
+      'V.integer' => 'An integer is required',
+    ];
+  }
+
   private function delGame ($r)
   {
     $r->validate ([
@@ -117,16 +118,11 @@ class gamesC extends Controller
 
   }
 
-  private function showAll ($r)
+  private function showAll ()
   {
-    $post = $r->all ();
+    $status = Game::listAll ($lst);
 
-    $status = Game::listAll ($post, $lst);
-
-    if ($status === listOK)
-      $this->render ['listing'] = $lst;
-    else
-      $this->checkStatus ($status);
+    $this->render ['listing'] = $lst;
   }
 
   private function fkIdGame ($lv)
