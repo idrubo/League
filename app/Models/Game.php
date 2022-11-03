@@ -13,15 +13,14 @@ class Game extends Model
   {
     msgToConsole ("Into: Game::saveGame");
 
-    if (! ($idLocal = self::fkIdGame ($post ['local'])))     return 1;
-
-    if (! ($idVisitor = self::fkIdGame ($post ['visitor']))) return 2;
+    if (! ($idLocal   = self::fkIdGame ($post ['local'])))   return localNotXST;
+    if (! ($idVisitor = self::fkIdGame ($post ['visitor']))) return visitNotXST;
 
     $game = Game::where ('idLocal', $idLocal)
       ->where ('idVisitor', $idVisitor)
       ->get ();
 
-    if ($idLocal === $idVisitor) return 3;
+    if ($idLocal === $idVisitor) return teamsEQU;
 
     if (! $game->count ())
     {
@@ -36,16 +35,15 @@ class Game extends Model
 
       $games->save();
 
-      return 0;
+      return crudOK;
     }
 
-    return 4;
+    return gameXST;
   }
 
   public function updateGame ($post)
   {
-    if (! ($idLocal = self::fkIdGame ($post ['local'])))     return 1;
-
+    if (! ($idLocal   = self::fkIdGame ($post ['local'])))   return 1;
     if (! ($idVisitor = self::fkIdGame ($post ['visitor']))) return 2;
 
     $game = Game::where ('idLocal', $idLocal)
@@ -71,10 +69,89 @@ class Game extends Model
           'V'        => $post ['V'],
         ]);
 
-      return 0;
+      return crudOK;
     }
 
-    return 5;
+    return gameNotXST;
+  }
+
+  public function deleteGame ($post)
+  {
+    if (! $idLocal   = self::fkIdGame ($post ['local']))   return 1;
+    if (! $idVisitor = self::fkIdGame ($post ['visitor'])) return 2;
+
+    $game = Game::where ('idLocal', $idLocal)
+      ->where ('idVisitor', $idVisitor)
+      ->get ();
+
+    if ($game->count ())
+    {
+      Game::where ('idLocal', $idLocal)
+        ->where ('idVisitor', $idVisitor)
+        ->delete ();
+
+      return crudOK;
+    }
+    return gameNotXST;
+  }
+
+  public function listGame ($post, & $lst)
+  {
+    if (! $idLocal   = self::fkIdGame ($post ['local']))   return 1;
+    if (! $idVisitor = self::fkIdGame ($post ['visitor'])) return 2;
+
+    $game = Game::where ('idLocal', $idLocal)
+      ->where ('idVisitor', $idVisitor)
+      ->get ();
+
+    if ($game->count ())
+    {
+      foreach ($game as $g)
+      {
+        $local   = Team::where ('id', $idLocal)->get ();
+        $visitor = Team::where ('id', $idVisitor)->get ();
+
+        foreach ($local as $l) $lV = $l->team;
+        foreach ($visitor as $v) $vV = $v->team;
+
+        $lst = array (
+          'local'    => $lV,
+          'visitor'  => $vV,
+          'location' => $g->location,
+          'dGame'    => $g->dGame,
+          'L'        => $g->L,
+          'V'        => $g->V,
+        );
+      }
+      return listOK;
+    }
+    return gameNotXST;
+  }
+
+  public function listAll ($post, & $lst)
+  {
+    $lst = array ();
+
+    $game = Game::all ();
+
+    foreach ($game as $g)
+    {
+      $local   = Team::where ('id', $g->idLocal)->get ();
+      $visitor = Team::where ('id', $g->idVisitor)->get ();
+
+      foreach ($local as $l) $lV = $l->team;
+      foreach ($visitor as $v) $vV = $v->team;
+
+      $item ['local']    = $lV;
+      $item ['visitor']  = $vV;
+      $item ['location'] = $g->location;
+      $item ['dGame']    = $g->dGame;
+      $item ['L']        = $g->L;
+      $item ['V']        = $g->V;
+
+      array_push ($lst, $item);
+    }
+    return listOK;
   }
 
   private function fkIdGame ($lv)
@@ -89,3 +166,4 @@ class Game extends Model
   }
 }
 
+?>

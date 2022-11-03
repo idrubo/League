@@ -6,6 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Game;
 
+define ("crudOK",      0);
+define ("localNotXST", 1);
+define ("visitNotXST", 2);
+define ("teamsEQU",    3);
+define ("gameXST",     4);
+define ("gameNotXST",  5);
+define ("listOK",      6);
+
 require_once base_path () . "/debug/toConsole.php";
 
 class gamesC extends Controller
@@ -86,44 +94,9 @@ class gamesC extends Controller
 
     $post = $r->all ();
 
-    /* DEBUG */
-    /* DEBUG */
-    /* DEBUG */
-    /* The following code is repeated four times. */
+    $status = Game::deleteGame ($post);
 
-    $idLocal = $this->fkIdGame ($post ['local']);
-    if (! $idLocal)
-    {
-      $this->render ['local'] = 'Doesn\'t exist !!!';
-      return;
-    }
-
-    $idVisitor = $this->fkIdGame ($post ['visitor']);
-    if (! $idVisitor)
-    {
-      $this->render ['visitor'] = 'Doesn\'t exist !!!';
-      return;
-    }
-
-    $game = Game::where ('idLocal', $idLocal)
-      ->where ('idVisitor', $idVisitor)
-      ->get ();
-
-    /* DEBUG */
-    /* DEBUG */
-    /* DEBUG */
-
-    if ($game->count ())
-    {
-      Game::where ('idLocal', $idLocal)
-        ->where ('idVisitor', $idVisitor)
-        ->delete ();
-
-      return;
-    }
-
-    $this->render ['local']   = 'Doesn\'t exist !!!';
-    $this->render ['visitor'] = 'Doesn\'t exist !!!';
+    $this->checkStatus ($status);
   }
 
   private function showGame ($r)
@@ -135,87 +108,25 @@ class gamesC extends Controller
 
     $post = $r->all ();
 
-    /* DEBUG */
-    /* DEBUG */
-    /* DEBUG */
-    /* The following code is repeated four times. */
+    $status = Game::listGame ($post, $lst);
 
-    $idLocal = $this->fkIdGame ($post ['local']);
-    if (! $idLocal)
-    {
-      $this->render ['local'] = 'Doesn\'t exist !!!';
-      return;
-    }
-
-    $idVisitor = $this->fkIdGame ($post ['visitor']);
-    if (! $idVisitor)
-    {
-      $this->render ['visitor'] = 'Doesn\'t exist !!!';
-      return;
-    }
-
-    $game = Game::where ('idLocal', $idLocal)
-      ->where ('idVisitor', $idVisitor)
-      ->get ();
-
-    /* DEBUG */
-    /* DEBUG */
-    /* DEBUG */
-
-    if ($game->count ())
-    {
-      foreach ($game as $g)
-      {
-        $local   = Team::where ('id', $idLocal)->get ();
-        $visitor = Team::where ('id', $idVisitor)->get ();
-
-        foreach ($local as $l) $lV = $l->team;
-        foreach ($visitor as $v) $vV = $v->team;
-
-        $lst = array (
-          'local'    => $lV,
-          'visitor'  => $vV,
-          'location' => $g->location,
-          'dGame'    => $g->dGame,
-          'L'        => $g->L,
-          'V'        => $g->V,
-        );
-      }
+    if ($status === listOK)
       $this->render ['listing'] = array ($lst);
-      return;
-    }
+    else
+      $this->checkStatus ($status);
 
-    $this->render ['player'] = 'Doesn\'t exist !!!';
   }
 
   private function showAll ($r)
   {
-    $item = array ();
-    $lst  = array ();
-
     $post = $r->all ();
 
-    $game = Game::all ();
+    $status = Game::listAll ($post, $lst);
 
-    foreach ($game as $g)
-    {
-      $local   = Team::where ('id', $g->idLocal)->get ();
-      $visitor = Team::where ('id', $g->idVisitor)->get ();
-
-      foreach ($local as $l) $lV = $l->team;
-      foreach ($visitor as $v) $vV = $v->team;
-
-      $item ['local']    = $lV;
-      $item ['visitor']  = $vV;
-      $item ['location'] = $g->location;
-      $item ['dGame']    = $g->dGame;
-      $item ['L']        = $g->L;
-      $item ['V']        = $g->V;
-
-      array_push ($lst, $item);
-    }
-
-    $this->render ['listing'] = $lst;
+    if ($status === listOK)
+      $this->render ['listing'] = $lst;
+    else
+      $this->checkStatus ($status);
   }
 
   private function fkIdGame ($lv)
@@ -233,25 +144,25 @@ class gamesC extends Controller
   {
     switch ($status)
     {
-    case 1:
-      $this->render ['local'] = 'Doesn\'t exist !!!';
+    case localNotXST:
+      $this->render ['local']   = 'Doesn\'t exist !!!';
       break;
 
-    case 2:
+    case visitNotXST:
       $this->render ['visitor'] = 'Doesn\'t exist !!!';
       break;
 
-    case 3:
+    case teamsEQU:
       $this->render ['local']   = 'Teams must be different !!!';
       $this->render ['visitor'] = 'Teams must be different !!!';
       break;
 
-    case 4:
+    case gameXST:
       $this->render ['local']   = 'Game already exist !!!';
       $this->render ['visitor'] = 'Game already exist !!!';
       break;
 
-    case 5:
+    case gameNotXST:
       $this->render ['local']   = 'Game doesn\'t exist !!!';
       $this->render ['visitor'] = 'Game doesn\'t exist !!!';
       break;
