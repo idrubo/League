@@ -120,7 +120,7 @@ class gamesC extends Controller
 
   private function showAll ()
   {
-    $status = Game::listAll ($lst);
+    Game::listAll ($lst);
 
     $this->render ['listing'] = $lst;
   }
