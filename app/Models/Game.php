@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+require_once base_path () . "/app/Http/Controllers/status.php";
+
 class Game extends Model
 {
   use HasFactory;
 
   public function saveGame ($post)
   {
-    msgToConsole ("Into: Game::saveGame");
-
     if (! ($idLocal   = self::fkIdGame ($post ['local'])))   return localNotXST;
     if (! ($idVisitor = self::fkIdGame ($post ['visitor']))) return visitNotXST;
 
@@ -43,8 +43,8 @@ class Game extends Model
 
   public function updateGame ($post)
   {
-    if (! ($idLocal   = self::fkIdGame ($post ['local'])))   return 1;
-    if (! ($idVisitor = self::fkIdGame ($post ['visitor']))) return 2;
+    if (! ($idLocal   = self::fkIdGame ($post ['local'])))   return localNotXST;
+    if (! ($idVisitor = self::fkIdGame ($post ['visitor']))) return visitNotXST;
 
     $game = Game::where ('idLocal', $idLocal)
       ->where ('idVisitor', $idVisitor)
@@ -77,8 +77,8 @@ class Game extends Model
 
   public function deleteGame ($post)
   {
-    if (! $idLocal   = self::fkIdGame ($post ['local']))   return 1;
-    if (! $idVisitor = self::fkIdGame ($post ['visitor'])) return 2;
+    if (! $idLocal   = self::fkIdGame ($post ['local']))   return localNotXST;
+    if (! $idVisitor = self::fkIdGame ($post ['visitor'])) return visitNotXST;
 
     $game = Game::where ('idLocal', $idLocal)
       ->where ('idVisitor', $idVisitor)
@@ -97,8 +97,8 @@ class Game extends Model
 
   public function listGame ($post, & $lst)
   {
-    if (! $idLocal   = self::fkIdGame ($post ['local']))   return 1;
-    if (! $idVisitor = self::fkIdGame ($post ['visitor'])) return 2;
+    if (! $idLocal   = self::fkIdGame ($post ['local']))   return localNotXST;
+    if (! $idVisitor = self::fkIdGame ($post ['visitor'])) return visitNotXST;
 
     $game = Game::where ('idLocal', $idLocal)
       ->where ('idVisitor', $idVisitor)
@@ -128,7 +128,7 @@ class Game extends Model
     return gameNotXST;
   }
 
-  public function listAll ($post, & $lst)
+  public function listAll (& $lst)
   {
     $lst = array ();
 
@@ -151,7 +151,6 @@ class Game extends Model
 
       array_push ($lst, $item);
     }
-    return listOK;
   }
 
   private function fkIdGame ($lv)

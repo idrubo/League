@@ -6,43 +6,43 @@ use Illuminate\Http\Request;
 use App\Models\Team;
 
 require_once base_path () . "/debug/toConsole.php";
+require_once base_path () . "/app/Http/Controllers/status.php";
 
 class teamsC extends Controller
 {
+  private $render;
+
+  public function __construct ()
+  {
+    $this->render = array ('listing' => false, 'team'  => false);
+  }
+
   public function manage (Request $request)
   {
-    $render = array ('listing' => false, 'exists'  => false);
-
     $method = $request->method ();
 
     if ($request->isMethod ("post"))
     {
       if ($request->has ('create'))
-        $render ['exists'] = $this->crtTeam ($request);
+        $this->crtTeam ($request);
 
       if ($request->has ('update'))
-        $render ['exists'] = $this->updtTeam ($request);
+        $this->updtTeam ($request);
 
       if ($request->has ('delete'))
-        $render ['exists'] = $this->delTeam ($request);
+        $this->delTeam ($request);
 
       if ($request->has ('show'))
-      {
-        $render ['listing'] = $this->showTeam ($request);
-        if ($render ['listing'] === false)
-          $render ['exists'] = 'Doesn\'t exist';
-      }
+        $this->showTeam ($request);
 
       if ($request->has ('all'))
-        $render ['listing'] = $this->showAll ($request);
+        $this->showAll ($request);
     }
-    return view ('/teams/teams', $render);
+    return view ('/teams/teams', $this->render);
   }
 
   private function crtTeam ($r)
   {
-    $exists = false;
-
     $r->validate ([
       'team'    => 'required|max:50',
       'address' => 'required|max:100',
@@ -51,107 +51,69 @@ class teamsC extends Controller
 
     $post = $r->all();
 
-    if (! Team::where ('team', $post ['team'])->get ()->count ())
-    {
-      $row = new Team ();
+    $status = Team::saveTeam ($post);
 
-      $row->team    = $post ['team'];
-      $row->address = $post ['address'];
-      $row->phone   = $post ['phone'];
-
-      $row->save();
-
-      return $exists;
-    }
-
-    return $exists = 'Already exists !!!';
+    $this->checkStatus ($status);
   }
 
   private function updtTeam ($r)
   {
-    $exists = false;
-
     $r->validate ([
       'team'    => 'required|max:50',
     ]);
 
     $post = $r->all ();
 
-    $row = Team::where ('team', $post ['team'])->get ();
+    $status = Team::updateTeam ($post);
 
-    if ($row->count ())
-    {
-
-      foreach ($row as $r)
-      {
-        if (empty ($post ['address'])) $post ['address'] = $r->address;
-        if (empty ($post ['phone']))   $post ['phone']   = $r->phone;
-      }
-
-      $row = Team::where ('team', $post ['team'])
-        ->update ([
-          'address' => $post ['address'],
-          'phone'   => $post ['phone']]);
-
-      return $exists;
-    }
-
-    return $exists = 'Doesn\'t exist !!!';
+    $this->checkStatus ($status);
   }
 
   private function delTeam ($r)
   {
-    $exists = false;
-
     $r->validate ([
       'team'    => 'required|max:50',
     ]);
 
     $post = $r->all ();
 
-    if (Team::where ('team', $post ['team'])->get ()->count ())
-    {
-      $row = Team::where ('team', $post ['team'])->delete ();
-      return $exists;
-    }
+    $status = Team::deleteTeam ($post);
 
-    return $exists = 'Doesn\'t exist !!!';
+    $this->checkStatus ($status);
   }
 
   private function showTeam ($r)
   {
-    $listing = false;
-
     $r->validate ([
       'team'    => 'required|max:50',
     ]);
 
     $post = $r->all ();
 
-    $rows = Team::where ('team', $post ['team'])->get ();
+    $status = Team::listTeam ($post, $lst);
 
-    if ($rows->count ())
-    {
-      foreach ($rows as $r)
-      {
-        $lst = array (
-          'team'    => $r->team,
-          'address' => $r->address,
-          'phone'   => $r->phone);
-      }
-      return $listing = array ($lst);
-    }
-
-    return $listing;
+    if ($status === listOK)
+      $this->render ['listing'] = array ($lst);
+    else
+      $this->checkStatus ($status);
   }
 
-  private function showAll ($r)
+  private function showAll () { $this->render ['listing'] = Team::listAll (); }
+
+  private function checkStatus ($status)
   {
-    $post = $r->all ();
+    switch ($status)
+    {
+    case teamXST:
+      $this->render ['team'] = 'Already exists !!!';
+      break;
 
-    return $listing = Team::all ();
+    case teamNotXST:
+      $this->render ['team'] = 'Doesn\'t exist !!!';
+      break;
+    }
   }
-}
 
+}
 ?>
 

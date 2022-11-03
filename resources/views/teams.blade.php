@@ -58,7 +58,7 @@
                 </div>
                 <div class="pt-0 pr-0 pb-0 pl-1 text-red-500 font-bold">
                   @error('team') {{ $message }} @enderror
-                  @if ($exists !== false) {{ $exists }} @endif
+                  @if ($team !== false) {{ $team }} @endif
                 </div>
               </div>
 
