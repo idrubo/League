@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\teamsC;
 use App\Http\Controllers\playersC;
+use App\Http\Controllers\gamesC;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,4 +25,7 @@ Route::post ('/teams/', [teamsC::class, 'manage']);
 
 Route::get  ('/players/', [playersC::class, 'manage']);
 Route::post ('/players/', [playersC::class, 'manage']);
+
+Route::get  ('/games/', [gamesC::class, 'manage']);
+Route::post ('/games/', [gamesC::class, 'manage']);
 
