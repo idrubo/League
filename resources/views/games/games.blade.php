@@ -83,7 +83,7 @@
 
               <div class="flex flex-row justify-start"> 
                 <div class="mt-0 mr-0 mb-2.5 ml-0 bg-white border-2 border-solid border-Navy placeholder-Gray">
-                  <input type="text" name="dGame" placeholder="Date" class="w-full">
+                  <input type="text" name="dGame" placeholder="Date: yyyy-mm-dd hh:mm:ss" class="w-full">
                 </div>
                 <div class="pt-0 pr-0 pb-0 pl-1 text-red-500 font-bold">
                   @error('dGame') {{ $message }} @enderror
