@@ -9,6 +9,17 @@ class Game extends Model
 {
   use HasFactory;
 
+
+  public function teamsL ()
+  {
+    return $this->belongsTo (Team::class, 'idLocal', 'id');
+  }
+
+  public function teamsV ()
+  {
+    return $this->belongsTo (Team::class, 'idVisitor', 'id');
+  }
+
   public function saveGame ($post)
   {
     msgToConsole ("Into: Game::saveGame");
@@ -108,15 +119,9 @@ class Game extends Model
     {
       foreach ($game as $g)
       {
-        $local   = Team::where ('id', $idLocal)->get ();
-        $visitor = Team::where ('id', $idVisitor)->get ();
-
-        foreach ($local as $l) $lV = $l->team;
-        foreach ($visitor as $v) $vV = $v->team;
-
         $lst = array (
-          'local'    => $lV,
-          'visitor'  => $vV,
+          'local'    => $g->teamsL->team,
+          'visitor'  => $g->teamsV->team,
           'location' => $g->location,
           'dGame'    => $g->dGame,
           'L'        => $g->L,
@@ -136,14 +141,8 @@ class Game extends Model
 
     foreach ($game as $g)
     {
-      $local   = Team::where ('id', $g->idLocal)->get ();
-      $visitor = Team::where ('id', $g->idVisitor)->get ();
-
-      foreach ($local as $l) $lV = $l->team;
-      foreach ($visitor as $v) $vV = $v->team;
-
-      $item ['local']    = $lV;
-      $item ['visitor']  = $vV;
+      $item ['local']    = $g->teamsL->team;
+      $item ['visitor']  = $g->teamsV->team;
       $item ['location'] = $g->location;
       $item ['dGame']    = $g->dGame;
       $item ['L']        = $g->L;
