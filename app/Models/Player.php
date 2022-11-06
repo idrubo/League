@@ -11,6 +11,11 @@ class Player extends Model
 {
   use HasFactory;
 
+  public function teams ()
+  {
+    return $this->belongsTo (Team::class, 'idplatea', 'id');
+  }
+
   public function savePlayer ($post)
   {
     $player = Player::where ('player', $post ['player'])->get ();
@@ -61,7 +66,6 @@ class Player extends Model
 
       return crudOK;
     }
-
     return playerNotXST;
   }
 
@@ -86,11 +90,8 @@ class Player extends Model
     {
       foreach ($player as $p)
       {
-        $row = Team::where ('id', $p->idplatea)->get ();
-        foreach ($row as $r) $team = $r->team;
-
         $lst = array (
-          'team'    => $team,
+          'team'    => $p->teams->team,
           'player'  => $p->player,
           'address' => $p->address,
           'phone'   => $p->phone,
@@ -98,7 +99,6 @@ class Player extends Model
       }
       return listOK;
     }
-
     return playerNotXST;
   }
 
@@ -110,10 +110,7 @@ class Player extends Model
 
     foreach ($player as $p)
     {
-      $row = Team::where ('id', $p->idplatea)->get ();
-      foreach ($row as $r) $team = $r->team;
-
-      $item ['team']    = $team;
+      $item ['team']    = $p->teams->team;
       $item ['player']  = $p->player;
       $item ['address'] = $p->address;
       $item ['phone']   = $p->phone;
@@ -136,3 +133,4 @@ class Player extends Model
   }
 }
 ?>
+
