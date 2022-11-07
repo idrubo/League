@@ -78,14 +78,6 @@ class gamesC extends Controller
     $this->checkStatus ($status);
   }
 
-  public function messages()
-  {
-    return [
-      'L.integer' => 'An integer is required',
-      'V.integer' => 'An integer is required',
-    ];
-  }
-
   private function delGame ($r)
   {
     $r->validate ([
