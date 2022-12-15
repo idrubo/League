@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\teamsC;
+use App\Http\Controllers\playersC;
+use App\Http\Controllers\gamesC;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,18 +16,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-// 
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth'])->name('dashboard');
-
-use App\Http\Controllers\teamsC;
-use App\Http\Controllers\playersC;
-use App\Http\Controllers\gamesC;
 
 Route::get  ('/', [teamsC::class, 'manage']);
 Route::post ('/', [teamsC::class, 'manage']);
@@ -36,6 +28,4 @@ Route::post ('/players/', [playersC::class, 'manage']);
 
 Route::get  ('/games/', [gamesC::class, 'manage']);
 Route::post ('/games/', [gamesC::class, 'manage']);
-
-require __DIR__.'/auth.php';
 
